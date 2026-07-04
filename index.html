@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aegis Twin — Digital Twin Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080b12;
+  --bg-2:#0c1119;
+  --panel:rgba(18,25,37,0.62);
+  --panel-solid:#111826;
+  --panel-2:#0e1520;
+  --border:rgba(148,163,184,0.10);
+  --border-strong:rgba(148,163,184,0.20);
+  --text:#e7ecf3;
+  --text-dim:#8f9bb0;
+  --text-faint:#5b6678;
+  --primary:#3B82F6;
+  --primary-dim:#1d4ed8;
+  --cyan:#22D3EE;
+  --green:#22c55e;
+  --amber:#f59e0b;
+  --violet:#8b5cf6;
+  --red:#ef4444;
+  --slate:#64748b;
+  --radius:14px;
+  --font-display:'Space Grotesk',sans-serif;
+  --font-body:'Inter',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--bg);color:var(--text);font-family:var(--font-body);height:100%;overflow:hidden;-webkit-font-smoothing:antialiased;}
+body{
+  background:
+    radial-gradient(circle at 15% 0%, rgba(59,130,246,0.10), transparent 45%),
+    radial-gradient(circle at 85% 100%, rgba(34,211,238,0.06), transparent 40%),
+    var(--bg);
+}
+::-webkit-scrollbar{width:8px;height:8px;}
+::-webkit-scrollbar-thumb{background:rgba(148,163,184,0.18);border-radius:8px;}
+::-webkit-scrollbar-track{background:transparent;}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;cursor:pointer;}
+
+.app{display:flex;height:100vh;width:100vw;}
+
+/* ===== Sidebar ===== */
+.sidebar{
+  width:232px;flex-shrink:0;background:var(--panel-2);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;padding:20px 14px;
+}
+.brand{display:flex;align-items:center;gap:10px;padding:6px 8px 22px;}
+.brand-mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--primary),var(--cyan));display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.brand-mark svg{width:16px;height:16px;}
+.brand-name{font-family:var(--font-display);font-weight:600;font-size:15px;letter-spacing:0.2px;}
+.brand-sub{font-size:10px;color:var(--text-faint);letter-spacing:1.5px;text-transform:uppercase;margin-top:1px;}
+
+.nav-group{margin-bottom:18px;}
+.nav-label{font-size:10.5px;color:var(--text-faint);text-transform:uppercase;letter-spacing:1.2px;padding:0 10px 8px;font-weight:600;}
+.nav-item{
+  display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:9px;
+  font-size:13.5px;color:var(--text-dim);font-weight:500;transition:background .15s,color .15s;margin-bottom:2px;
+}
+.nav-item svg{width:17px;height:17px;flex-shrink:0;opacity:.85;}
+.nav-item:hover{background:rgba(148,163,184,0.06);color:var(--text);}
+.nav-item.active{background:rgba(59,130,246,0.12);color:#cfe0ff;}
+.nav-item.active svg{opacity:1;}
+.nav-badge{
+  margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:600;
+  padding:1px 6px;border-radius:20px;font-family:var(--font-mono);
+}
+
+.sidebar-foot{margin-top:auto;border-top:1px solid var(--border);padding-top:14px;}
+.factory-pulse{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;background:rgba(34,197,94,0.08);}
+.dot-pulse{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 0 rgba(34,197,94,.6);animation:pulseDot 1.8s infinite;flex-shrink:0;}
+@keyframes pulseDot{0%{box-shadow:0 0 0 0 rgba(34,197,94,.5);}70%{box-shadow:0 0 0 6px rgba(34,197,94,0);}100%{box-shadow:0 0 0 0 rgba(34,197,94,0);}}
+.factory-pulse-text{font-size:11.5px;color:var(--text-dim);}
+.factory-pulse-text b{color:var(--text);font-weight:600;}
+
+/* ===== Main ===== */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;}
+
+.topbar{
+  height:60px;flex-shrink:0;border-bottom:1px solid var(--border);display:flex;align-items:center;
+  padding:0 22px;gap:16px;background:rgba(12,17,25,0.7);backdrop-filter:blur(10px);
+}
+.topbar h1{font-family:var(--font-display);font-size:16px;font-weight:600;}
+.topbar-sub{font-size:11.5px;color:var(--text-faint);margin-left:10px;padding-left:10px;border-left:1px solid var(--border);}
+.search-box{
+  display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.03);border:1px solid var(--border);
+  border-radius:9px;padding:7px 12px;width:260px;margin-left:auto;color:var(--text-faint);font-size:12.5px;
+}
+.search-box svg{width:14px;height:14px;flex-shrink:0;}
+.search-box input{background:none;border:none;color:var(--text);font-size:12.5px;outline:none;flex:1;font-family:inherit;}
+.top-icon-btn{
+  width:34px;height:34px;border-radius:9px;border:1px solid var(--border);background:rgba(255,255,255,0.02);
+  display:flex;align-items:center;justify-content:center;color:var(--text-dim);position:relative;flex-shrink:0;
+  transition:background .15s;
+}
+.top-icon-btn:hover{background:rgba(255,255,255,0.05);color:var(--text);}
+.top-icon-btn svg{width:16px;height:16px;}
+.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--red);border:1.5px solid var(--bg-2);}
+.avatar{
+  width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#334155,#1e293b);border:1px solid var(--border-strong);
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--cyan);font-family:var(--font-mono);flex-shrink:0;
+}
+
+.view-wrap{flex:1;overflow-y:auto;padding:24px 28px 40px;}
+.view{display:none;}
+.view.active{display:block;animation:fadeIn .3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+.section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
+.section-title{font-family:var(--font-display);font-size:20px;font-weight:600;}
+.section-desc{font-size:12.5px;color:var(--text-faint);margin-top:3px;}
+
+/* ===== Cards / grid ===== */
+.grid{display:grid;gap:14px;}
+.grid-4{grid-template-columns:repeat(4,1fr);}
+.grid-3{grid-template-columns:repeat(3,1fr);}
+.grid-2{grid-template-columns:repeat(2,1fr);}
+@media (max-width:1200px){.grid-4{grid-template-columns:repeat(2,1fr);}.grid-3{grid-template-columns:repeat(2,1fr);}}
+
+.card{
+  background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;
+  backdrop-filter:blur(14px);position:relative;overflow:hidden;
+}
+.card::before{content:"";position:absolute;inset:0;background:linear-gradient(160deg,rgba(255,255,255,0.03),transparent 40%);pointer-events:none;}
+
+.kpi-label{font-size:11.5px;color:var(--text-faint);font-weight:500;letter-spacing:.3px;display:flex;align-items:center;gap:6px;}
+.kpi-value{font-family:var(--font-mono);font-size:26px;font-weight:600;margin-top:8px;letter-spacing:-0.5px;}
+.kpi-value span{font-size:14px;color:var(--text-faint);font-weight:500;}
+.kpi-delta{font-size:11px;margin-top:6px;display:flex;align-items:center;gap:4px;font-weight:500;}
+.kpi-delta.up{color:var(--green);}
+.kpi-delta.down{color:var(--red);}
+.kpi-bar{height:4px;border-radius:4px;background:rgba(148,163,184,0.1);margin-top:12px;overflow:hidden;}
+.kpi-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--primary),var(--cyan));transition:width .6s ease;}
+
+.panel-title{font-family:var(--font-display);font-size:14px;font-weight:600;margin-bottom:2px;}
+.panel-sub{font-size:11.5px;color:var(--text-faint);margin-bottom:14px;}
+
+.chart-wrap{position:relative;width:100%;height:230px;}
+
+/* status pill */
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;font-family:var(--font-mono);letter-spacing:.2px;}
+.pill .dot{width:6px;height:6px;border-radius:50%;}
+.pill.running{background:rgba(34,197,94,0.12);color:#6ee7a7;}
+.pill.running .dot{background:var(--green);box-shadow:0 0 6px var(--green);}
+.pill.idle{background:rgba(245,158,11,0.12);color:#fcd34d;}
+.pill.idle .dot{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+.pill.maintenance{background:rgba(139,92,246,0.14);color:#c4b5fd;}
+.pill.maintenance .dot{background:var(--violet);box-shadow:0 0 6px var(--violet);}
+.pill.offline{background:rgba(100,116,139,0.14);color:#b6c0cf;}
+.pill.offline .dot{background:var(--slate);}
+
+/* ===== Machines list ===== */
+.machine-row{
+  display:grid;grid-template-columns:40px 1.4fr 1fr 1fr 1fr 90px;align-items:center;gap:14px;
+  padding:13px 16px;border-radius:12px;border:1px solid var(--border);margin-bottom:8px;background:rgba(255,255,255,0.015);
+  transition:background .15s,border-color .15s;cursor:pointer;
+}
+.machine-row:hover{background:rgba(255,255,255,0.035);border-color:var(--border-strong);}
+.machine-row-head{display:grid;grid-template-columns:40px 1.4fr 1fr 1fr 1fr 90px;gap:14px;padding:0 16px 8px;font-size:10.5px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.6px;font-weight:600;}
+.m-icon{width:38px;height:38px;border-radius:10px;background:rgba(59,130,246,0.10);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.m-icon svg{width:19px;height:19px;color:var(--cyan);}
+.m-name{font-weight:600;font-size:13.5px;}
+.m-id{font-size:11px;color:var(--text-faint);font-family:var(--font-mono);}
+.m-metric{font-family:var(--font-mono);font-size:13px;}
+.m-metric-label{font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.4px;}
+
+/* ===== Digital Twin ===== */
+.twin-layout{display:grid;grid-template-columns:1fr 340px;gap:16px;height:calc(100vh - 172px);min-height:560px;}
+.twin-canvas-card{border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;position:relative;background:radial-gradient(circle at 50% 20%, #0d1522, #06090f 75%);}
+.twin-canvas-card canvas{display:block;width:100%;height:100%;cursor:grab;}
+.twin-canvas-card canvas:active{cursor:grabbing;}
+.twin-hint{position:absolute;top:14px;left:16px;font-size:11px;color:var(--text-faint);background:rgba(8,11,18,0.55);padding:6px 10px;border-radius:8px;border:1px solid var(--border);backdrop-filter:blur(6px);}
+.twin-legend{position:absolute;bottom:14px;left:16px;display:flex;gap:14px;background:rgba(8,11,18,0.55);padding:8px 14px;border-radius:10px;border:1px solid var(--border);backdrop-filter:blur(6px);}
+.twin-legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-dim);}
+.twin-legend-dot{width:7px;height:7px;border-radius:50%;}
+
+.sim-controls{position:absolute;top:14px;right:16px;display:flex;gap:6px;flex-wrap:wrap;max-width:260px;justify-content:flex-end;}
+.sim-btn{
+  font-size:11.5px;font-weight:600;padding:7px 12px;border-radius:8px;border:1px solid var(--border-strong);
+  background:rgba(8,11,18,0.6);color:var(--text-dim);backdrop-filter:blur(6px);transition:all .15s;display:flex;align-items:center;gap:6px;
+}
+.sim-btn:hover{background:rgba(255,255,255,0.06);color:var(--text);}
+.sim-btn.primary{background:rgba(59,130,246,0.85);border-color:var(--primary);color:#fff;}
+.sim-btn.primary:hover{background:var(--primary);}
+.sim-btn.danger{background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.5);color:#fca5a5;}
+.sim-btn.danger:hover{background:rgba(239,68,68,0.28);}
+.sim-btn.active{background:rgba(34,211,238,0.18);border-color:var(--cyan);color:var(--cyan);}
+.sim-btn:disabled{opacity:.4;cursor:not-allowed;}
+.sim-btn svg{width:13px;height:13px;}
+
+.side-panel{display:flex;flex-direction:column;gap:12px;overflow-y:auto;}
+.detail-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:18px;backdrop-filter:blur(14px);flex:1;display:flex;flex-direction:column;min-height:0;}
+.detail-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--text-faint);gap:10px;padding:30px 10px;}
+.detail-empty svg{width:34px;height:34px;opacity:.4;}
+.detail-empty p{font-size:12.5px;max-width:220px;line-height:1.6;}
+
+.detail-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
+.detail-name{font-family:var(--font-display);font-size:16px;font-weight:600;}
+.detail-id{font-size:11px;color:var(--text-faint);font-family:var(--font-mono);margin-top:2px;}
+
+.sensor-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.sensor-cell{background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:10px;padding:10px 12px;}
+.sensor-cell-label{font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.4px;}
+.sensor-cell-value{font-family:var(--font-mono);font-size:16px;font-weight:600;margin-top:3px;}
+.sensor-cell-value.warn{color:var(--amber);}
+.sensor-cell-value.crit{color:var(--red);}
+
+.health-row{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+.health-ring{width:52px;height:52px;flex-shrink:0;position:relative;}
+.health-ring svg{transform:rotate(-90deg);}
+.health-ring-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:13px;font-weight:600;}
+.health-meta{flex:1;}
+.health-meta .lbl{font-size:11px;color:var(--text-faint);}
+.health-meta .val{font-size:13px;font-weight:600;margin-top:1px;}
+
+.mini-chart-title{font-size:11px;color:var(--text-faint);margin:12px 0 6px;text-transform:uppercase;letter-spacing:.4px;}
+
+/* ===== Analytics ===== */
+.oee-breakdown{display:flex;gap:24px;align-items:center;}
+.oee-item{flex:1;text-align:center;}
+.oee-ring-wrap{width:96px;height:96px;margin:0 auto 8px;position:relative;}
+.oee-ring-wrap svg{transform:rotate(-90deg);}
+.oee-ring-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:18px;font-weight:600;}
+.oee-item-name{font-size:12px;color:var(--text-dim);font-weight:500;}
+
+/* ===== Alerts ===== */
+.alert-row{display:flex;gap:14px;padding:14px 16px;border-radius:12px;border:1px solid var(--border);margin-bottom:8px;background:rgba(255,255,255,0.015);}
+.alert-sev{width:3px;border-radius:3px;flex-shrink:0;}
+.alert-sev.info{background:var(--primary);}
+.alert-sev.warning{background:var(--amber);}
+.alert-sev.critical{background:var(--red);}
+.alert-body{flex:1;min-width:0;}
+.alert-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;}
+.alert-badge{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:5px;text-transform:uppercase;letter-spacing:.4px;}
+.alert-badge.info{background:rgba(59,130,246,0.15);color:#93c5fd;}
+.alert-badge.warning{background:rgba(245,158,11,0.15);color:#fcd34d;}
+.alert-badge.critical{background:rgba(239,68,68,0.15);color:#fca5a5;}
+.alert-machine{font-size:12px;font-weight:600;}
+.alert-time{font-size:11px;color:var(--text-faint);margin-left:auto;font-family:var(--font-mono);}
+.alert-desc{font-size:12.5px;color:var(--text-dim);margin-bottom:4px;}
+.alert-rec{font-size:11.5px;color:var(--text-faint);display:flex;gap:6px;}
+.alert-rec svg{width:13px;height:13px;flex-shrink:0;margin-top:1px;}
+.alert-empty{text-align:center;padding:60px 20px;color:var(--text-faint);}
+
+/* ===== AI panel ===== */
+.ai-card{display:flex;flex-direction:column;gap:10px;}
+.ai-tag{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:700;color:var(--cyan);background:rgba(34,211,238,0.1);padding:3px 9px;border-radius:6px;letter-spacing:.4px;text-transform:uppercase;width:fit-content;}
+.rul-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+.rul-name{font-size:12px;width:88px;flex-shrink:0;color:var(--text-dim);}
+.rul-track{flex:1;height:7px;border-radius:5px;background:rgba(148,163,184,0.1);overflow:hidden;}
+.rul-fill{height:100%;border-radius:5px;}
+.rul-val{font-family:var(--font-mono);font-size:11.5px;width:50px;text-align:right;color:var(--text-dim);flex-shrink:0;}
+.rca-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:12.5px;}
+.rca-item:last-child{border-bottom:none;}
+.rca-prob{font-family:var(--font-mono);color:var(--cyan);font-weight:600;flex-shrink:0;width:44px;}
+
+/* ===== Settings ===== */
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);}
+.settings-row:last-child{border-bottom:none;}
+.settings-label{font-size:13px;font-weight:500;}
+.settings-desc{font-size:11.5px;color:var(--text-faint);margin-top:2px;}
+.switch{width:38px;height:22px;border-radius:20px;background:rgba(148,163,184,0.18);position:relative;flex-shrink:0;transition:background .2s;}
+.switch.on{background:var(--primary);}
+.switch::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .2s;}
+.switch.on::after{left:19px;}
+.integration-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.integration-row:last-child{border-bottom:none;}
+.integration-icon{width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,0.03);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:10px;color:var(--text-faint);flex-shrink:0;}
+.badge-soon{font-size:10px;color:var(--text-faint);background:rgba(148,163,184,0.08);padding:3px 9px;border-radius:6px;margin-left:auto;font-weight:500;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 22V12M3 7l9 5 9-5" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      </div>
+      <div>
+        <div class="brand-name">Aegis Twin</div>
+        <div class="brand-sub">Factory OS</div>
+      </div>
+    </div>
+
+    <div class="nav-group" style="flex:1;">
+      <div class="nav-label">Platform</div>
+      <div class="nav-item active" data-view="overview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="5" rx="1.5"/><rect x="13" y="11" width="8" height="10" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/></svg>
+        Overview
+      </div>
+      <div class="nav-item" data-view="machines">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
+        Machines
+      </div>
+      <div class="nav-item" data-view="analytics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
+        Analytics
+      </div>
+      <div class="nav-item" data-view="alerts">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2a6 6 0 0 0-6 6v3.5c0 .7-.3 1.4-.8 1.9L4 15h16l-1.2-1.6a2.6 2.6 0 0 1-.8-1.9V8a6 6 0 0 0-6-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg>
+        Alerts
+        <span class="nav-badge" id="navAlertBadge">0</span>
+      </div>
+      <div class="nav-item" data-view="twin">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5z"/><path d="M3 7l9 5 9-5M12 22V12"/></svg>
+        Digital Twin
+      </div>
+      <div class="nav-item" data-view="settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </div>
+    </div>
+
+    <div class="sidebar-foot">
+      <div class="factory-pulse">
+        <div class="dot-pulse" id="sidebarStatusDot"></div>
+        <div class="factory-pulse-text">Factory <b id="sidebarStatusText">Running</b></div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <h1 id="topbarTitle">Overview</h1>
+      <span class="topbar-sub" id="topbarSub">Line 4 · Semiconductor Assembly</span>
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" placeholder="Search machines, alerts, reports...">
+      </div>
+      <button class="top-icon-btn" id="bellBtn" aria-label="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a6 6 0 0 0-6 6v3.5c0 .7-.3 1.4-.8 1.9L4 15h16l-1.2-1.6a2.6 2.6 0 0 1-.8-1.9V8a6 6 0 0 0-6-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg>
+        <span class="notif-dot" id="bellDot" style="display:none;"></span>
+      </button>
+      <div class="avatar" title="Max Chen">MC</div>
+    </div>
+
+    <div class="view-wrap">
+
+      <!-- OVERVIEW -->
+      <div class="view active" id="view-overview">
+        <div class="section-head">
+          <div>
+            <div class="section-title">Factory overview</div>
+            <div class="section-desc">Live snapshot across 5 connected assets · updated in real time</div>
+          </div>
+        </div>
+        <div class="grid grid-4" style="margin-bottom:16px;">
+          <div class="card">
+            <div class="kpi-label">Overall equipment effectiveness</div>
+            <div class="kpi-value" id="kpiOEE">87<span>%</span></div>
+            <div class="kpi-bar"><div class="kpi-bar-fill" id="kpiOEEBar" style="width:87%"></div></div>
+          </div>
+          <div class="card">
+            <div class="kpi-label">Machines running</div>
+            <div class="kpi-value" id="kpiRunning">4<span>/5</span></div>
+            <div class="kpi-delta up" id="kpiRunningDelta">All nominal</div>
+          </div>
+          <div class="card">
+            <div class="kpi-label">Energy draw</div>
+            <div class="kpi-value" id="kpiEnergy">18.4<span>kW</span></div>
+            <div class="kpi-delta down">▼ 2.1% vs. last hour</div>
+          </div>
+          <div class="card">
+            <div class="kpi-label">Open alerts</div>
+            <div class="kpi-value" id="kpiAlerts">0</div>
+            <div class="kpi-delta up" id="kpiAlertsDelta">No active faults</div>
+          </div>
+        </div>
+
+        <div class="grid" style="grid-template-columns:2fr 1fr;margin-bottom:16px;">
+          <div class="card">
+            <div class="panel-title">Energy consumption — last 60 samples</div>
+            <div class="panel-sub">Aggregate line draw, kW</div>
+            <div class="chart-wrap"><canvas id="overviewChart" role="img" aria-label="Line chart of live energy consumption over time">Live energy telemetry trending near 18 kW.</canvas></div>
+          </div>
+          <div class="card">
+            <div class="panel-title">Fleet status</div>
+            <div class="panel-sub">Current state of every asset</div>
+            <div id="fleetStatusList"></div>
+          </div>
+        </div>
+
+        <div class="grid grid-3">
+          <div class="card">
+            <div class="panel-title">Production today</div>
+            <div class="panel-sub">Units completed vs. target</div>
+            <div class="kpi-value" id="kpiProdToday">3,214<span>/ 3,800</span></div>
+            <div class="kpi-bar"><div class="kpi-bar-fill" id="kpiProdBar" style="width:85%"></div></div>
+          </div>
+          <div class="card">
+            <div class="panel-title">MTBF / MTTR</div>
+            <div class="panel-sub">Mean time between / to repair</div>
+            <div style="display:flex;gap:20px;margin-top:6px;">
+              <div><div class="kpi-value" style="font-size:20px;" id="kpiMTBF">142<span>h</span></div><div class="kpi-label" style="margin-top:4px;">MTBF</div></div>
+              <div><div class="kpi-value" style="font-size:20px;" id="kpiMTTR">1.8<span>h</span></div><div class="kpi-label" style="margin-top:4px;">MTTR</div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="panel-title">Downtime today</div>
+            <div class="panel-sub">Unplanned stoppage</div>
+            <div class="kpi-value" id="kpiDowntime">0<span>min</span></div>
+            <div class="kpi-delta up">Within SLA</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MACHINES -->
+      <div class="view" id="view-machines">
+        <div class="section-head">
+          <div>
+            <div class="section-title">Machines</div>
+            <div class="section-desc">Click any row to open its twin and live telemetry</div>
+          </div>
+        </div>
+        <div class="machine-row-head">
+          <div></div><div>Asset</div><div>Temp</div><div>Power</div><div>Health</div><div>Status</div>
+        </div>
+        <div id="machineList"></div>
+      </div>
+
+      <!-- ANALYTICS -->
+      <div class="view" id="view-analytics">
+        <div class="section-head">
+          <div>
+            <div class="section-title">Analytics</div>
+            <div class="section-desc">Plant KPIs and AI-assisted diagnostics</div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:16px;">
+          <div class="panel-title">OEE breakdown</div>
+          <div class="panel-sub">Availability × performance × quality</div>
+          <div class="oee-breakdown" style="margin-top:10px;">
+            <div class="oee-item">
+              <div class="oee-ring-wrap"><svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="40" fill="none" stroke="rgba(148,163,184,0.12)" stroke-width="8"/><circle id="ringAvail" cx="48" cy="48" r="40" fill="none" stroke="#3B82F6" stroke-width="8" stroke-linecap="round" stroke-dasharray="251" stroke-dashoffset="40"/></svg><div class="oee-ring-label" id="valAvail">94%</div></div>
+              <div class="oee-item-name">Availability</div>
+            </div>
+            <div class="oee-item">
+              <div class="oee-ring-wrap"><svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="40" fill="none" stroke="rgba(148,163,184,0.12)" stroke-width="8"/><circle id="ringPerf" cx="48" cy="48" r="40" fill="none" stroke="#22D3EE" stroke-width="8" stroke-linecap="round" stroke-dasharray="251" stroke-dashoffset="55"/></svg><div class="oee-ring-label" id="valPerf">92%</div></div>
+              <div class="oee-item-name">Performance</div>
+            </div>
+            <div class="oee-item">
+              <div class="oee-ring-wrap"><svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="40" fill="none" stroke="rgba(148,163,184,0.12)" stroke-width="8"/><circle id="ringQual" cx="48" cy="48" r="40" fill="none" stroke="#8b5cf6" stroke-width="8" stroke-linecap="round" stroke-dasharray="251" stroke-dashoffset="15"/></svg><div class="oee-ring-label" id="valQual">98%</div></div>
+              <div class="oee-item-name">Quality</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid" style="grid-template-columns:1fr 1fr;margin-bottom:16px;">
+          <div class="card">
+            <div class="panel-title">OEE trend</div>
+            <div class="panel-sub">Rolling plant OEE, %</div>
+            <div class="chart-wrap" style="height:200px;"><canvas id="oeeTrendChart" role="img" aria-label="Line chart of OEE trend over time">OEE trending around 87 percent.</canvas></div>
+          </div>
+          <div class="card">
+            <div class="panel-title">Energy vs. production</div>
+            <div class="panel-sub">kWh per 100 units, rolling</div>
+            <div class="chart-wrap" style="height:200px;"><canvas id="energyProdChart" role="img" aria-label="Line chart comparing energy usage and production rate">Energy per unit trending stable.</canvas></div>
+          </div>
+        </div>
+
+        <div class="section-head" style="margin-top:26px;">
+          <div>
+            <div class="section-title" style="font-size:16px;">AI diagnostics <span class="ai-tag" style="margin-left:8px;">Preview</span></div>
+            <div class="section-desc">Placeholder architecture — wired for future model integration, currently serving mock inference</div>
+          </div>
+        </div>
+        <div class="grid grid-2">
+          <div class="card ai-card">
+            <div class="panel-title">Anomaly detection — LSTM autoencoder</div>
+            <div class="panel-sub">Reconstruction error vs. threshold, per-asset sensor windows</div>
+            <div class="chart-wrap" style="height:170px;"><canvas id="anomalyChart" role="img" aria-label="Line chart of anomaly reconstruction error against threshold">Reconstruction error staying under threshold except during injected faults.</canvas></div>
+          </div>
+          <div class="card ai-card">
+            <div class="panel-title">Predictive maintenance</div>
+            <div class="panel-sub">Estimated remaining useful life by asset</div>
+            <div id="rulBars" style="margin-top:8px;"></div>
+          </div>
+          <div class="card ai-card">
+            <div class="panel-title">Root cause analysis</div>
+            <div class="panel-sub">Ranked contributing factors, most recent fault</div>
+            <div id="rcaList"></div>
+          </div>
+          <div class="card ai-card">
+            <div class="panel-title">AI recommendations</div>
+            <div class="panel-sub">Generated from current telemetry state</div>
+            <div id="aiRecoList" style="font-size:12.5px;color:var(--text-dim);display:flex;flex-direction:column;gap:10px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ALERTS -->
+      <div class="view" id="view-alerts">
+        <div class="section-head">
+          <div>
+            <div class="section-title">Alerts</div>
+            <div class="section-desc">Notification center for anomalies, faults, and maintenance events</div>
+          </div>
+          <button class="sim-btn" id="clearAlertsBtn" style="position:static;">Clear all</button>
+        </div>
+        <div id="alertsList"></div>
+      </div>
+
+      <!-- DIGITAL TWIN -->
+      <div class="view" id="view-twin">
+        <div class="section-head">
+          <div>
+            <div class="section-title">Digital twin — Line 4</div>
+            <div class="section-desc">Drag to rotate · scroll to zoom · click a machine for live detail</div>
+          </div>
+        </div>
+        <div class="twin-layout">
+          <div class="twin-canvas-card">
+            <canvas id="twinCanvas"></canvas>
+            <div class="twin-hint">5 assets connected · updating live</div>
+            <div class="sim-controls">
+              <button class="sim-btn primary" id="btnStart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3l16 9-16 9V3z"/></svg>Start</button>
+              <button class="sim-btn" id="btnStop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>Stop</button>
+              <button class="sim-btn danger" id="btnEmergency"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>E-Stop</button>
+              <button class="sim-btn" id="btnFault"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>Inject fault</button>
+              <button class="sim-btn" id="btnReset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5"/></svg>Reset</button>
+              <button class="sim-btn active" id="speed1" data-speed="1">×1</button>
+              <button class="sim-btn" id="speed5" data-speed="5">×5</button>
+              <button class="sim-btn" id="speed10" data-speed="10">×10</button>
+            </div>
+            <div class="twin-legend">
+              <div class="twin-legend-item"><span class="twin-legend-dot" style="background:#22c55e;"></span>Running</div>
+              <div class="twin-legend-item"><span class="twin-legend-dot" style="background:#f59e0b;"></span>Idle</div>
+              <div class="twin-legend-item"><span class="twin-legend-dot" style="background:#8b5cf6;"></span>Maintenance</div>
+              <div class="twin-legend-item"><span class="twin-legend-dot" style="background:#64748b;"></span>Offline</div>
+            </div>
+          </div>
+
+          <div class="side-panel">
+            <div class="detail-card" id="detailCard">
+              <div class="detail-empty">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5z"/><path d="M3 7l9 5 9-5M12 22V12"/></svg>
+                <p>Click a machine in the 3D scene, or from the Machines list, to open live telemetry, health score, and remaining useful life.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="view" id="view-settings">
+        <div class="section-head">
+          <div>
+            <div class="section-title">Settings</div>
+            <div class="section-desc">Platform preferences and future integrations</div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:16px;">
+          <div class="panel-title">Preferences</div>
+          <div class="settings-row">
+            <div><div class="settings-label">Metric units</div><div class="settings-desc">°C, kPa, mm/s — SI units across telemetry</div></div>
+            <div class="switch on" id="switchUnits"></div>
+          </div>
+          <div class="settings-row">
+            <div><div class="settings-label">Sound on critical alert</div><div class="settings-desc">Play a tone when a critical alert is raised</div></div>
+            <div class="switch" id="switchSound"></div>
+          </div>
+          <div class="settings-row">
+            <div><div class="settings-label">Auto-acknowledge info alerts</div><div class="settings-desc">Dismiss informational alerts after 60 seconds</div></div>
+            <div class="switch on" id="switchAuto"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="panel-title">Future integrations</div>
+          <div class="panel-sub" style="margin-bottom:6px;">The data layer is built to accept these without a rewrite</div>
+          <div class="integration-row"><div class="integration-icon">MQTT</div><div><div class="settings-label">MQTT broker</div><div class="settings-desc">Subscribe to live sensor topics from field devices</div></div><span class="badge-soon">Not connected</span></div>
+          <div class="integration-row"><div class="integration-icon">WS</div><div><div class="settings-label">WebSocket stream</div><div class="settings-desc">Push telemetry directly into the twin store</div></div><span class="badge-soon">Not connected</span></div>
+          <div class="integration-row"><div class="integration-icon">ESP</div><div><div class="settings-label">ESP32 / Arduino</div><div class="settings-desc">Edge microcontrollers reporting sensor data</div></div><span class="badge-soon">Not connected</span></div>
+          <div class="integration-row"><div class="integration-icon">RPi</div><div><div class="settings-label">Raspberry Pi edge node</div><div class="settings-desc">On-device inference for the LSTM autoencoder</div></div><span class="badge-soon">Not connected</span></div>
+          <div class="integration-row"><div class="integration-icon">SQL</div><div><div class="settings-label">TimescaleDB / PostgreSQL</div><div class="settings-desc">Historical telemetry storage and querying</div></div><span class="badge-soon">Not connected</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+/* ============================================================
+   STATE
+============================================================ */
+const STATUS_COLOR = { running:'#22c55e', idle:'#f59e0b', maintenance:'#8b5cf6', offline:'#64748b' };
+const FAULT_TYPES = ['Bearing failure','Motor overheating','High vibration','Sensor failure','Power spike','Conveyor jam'];
+
+const machines = [
+  { id:'RA-01', name:'Robot Arm', type:'robot', status:'running', pos:[-3.2,0,-1.6],
+    temp:42, power:3.1, current:6.4, rpm:1800, vibration:0.8, pressure:101.3, humidity:38,
+    rul:82, health:94, faultProb:3, hist:mkHist() },
+  { id:'CV-02', name:'Conveyor belt', type:'conveyor', status:'running', pos:[0,0,0],
+    temp:35, power:1.4, current:3.2, rpm:120, vibration:0.4, pressure:100.9, humidity:41,
+    rul:91, health:97, faultProb:2, hist:mkHist() },
+  { id:'AGV-03', name:'AGV transporter', type:'agv', status:'idle', pos:[3.4,0,1.8],
+    temp:29, power:0.3, current:0.8, rpm:0, vibration:0.1, pressure:101.1, humidity:40,
+    rul:76, health:90, faultProb:5, hist:mkHist() },
+  { id:'CNC-04', name:'CNC machine', type:'cnc', status:'running', pos:[-2.6,0,2.4],
+    temp:58, power:5.6, current:11.2, rpm:4200, vibration:1.2, pressure:102.0, humidity:36,
+    rul:64, health:85, faultProb:8, hist:mkHist() },
+  { id:'STG-05', name:'Storage area', type:'storage', status:'idle', pos:[3.0,0,-2.4],
+    temp:26, power:0.1, current:0.2, rpm:0, vibration:0.05, pressure:101.0, humidity:44,
+    rul:98, health:99, faultProb:1, hist:mkHist() },
+];
+
+function mkHist(){ return { temp:[], current:[], vibration:[], power:[] }; }
+
+let factoryRunning = true;
+let speedMultiplier = 1;
+let selectedMachineId = null;
+let tick = 0;
+let alerts = [];
+let alertIdSeq = 1;
+let downtimeMinutes = 0;
+let energyHistory = Array.from({length:40},(_,i)=>17+Math.sin(i/4)*1.2+Math.random());
+let oeeHistory = Array.from({length:30},()=>87+Math.random()*2-1);
+let energyProdHistory = Array.from({length:30},()=>5.2+Math.random()*0.3);
+let anomalyHistory = Array.from({length:40},()=>0.08+Math.random()*0.04);
+
+function fmt(n,d=1){ return Number(n).toFixed(d); }
+function nowStr(){ const d=new Date(); return d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+
+/* ============================================================
+   NAVIGATION
+============================================================ */
+const TITLES = { overview:['Overview','Line 4 · Semiconductor Assembly'], machines:['Machines','5 connected assets'], analytics:['Analytics','KPIs and AI diagnostics'], alerts:['Alerts','Notification center'], twin:['Digital Twin','Line 4 · Live 3D render'], settings:['Settings','Platform preferences'] };
+document.querySelectorAll('.nav-item').forEach(item=>{
+  item.addEventListener('click', ()=>{
+    document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+    item.classList.add('active');
+    const v = item.dataset.view;
+    document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+    document.getElementById('view-'+v).classList.add('active');
+    document.getElementById('topbarTitle').textContent = TITLES[v][0];
+    document.getElementById('topbarSub').textContent = TITLES[v][1];
+    if(v==='twin') setTimeout(onTwinResize, 30);
+  });
+});
+
+/* ============================================================
+   THREE.JS DIGITAL TWIN SCENE
+============================================================ */
+const canvas = document.getElementById('twinCanvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+const rig = new THREE.Group();
+scene.add(rig);
+
+camera.position.set(0, 6.5, 9.5);
+camera.lookAt(0,0,0);
+
+const ambient = new THREE.AmbientLight(0x8899cc, 0.55);
+scene.add(ambient);
+const dir = new THREE.DirectionalLight(0xffffff, 0.9);
+dir.position.set(5,8,4);
+scene.add(dir);
+const rim = new THREE.PointLight(0x3B82F6, 1.4, 20);
+rim.position.set(-4,3,-3);
+scene.add(rim);
+
+const floorGeo = new THREE.PlaneGeometry(14,14,28,28);
+const floorMat = new THREE.MeshStandardMaterial({ color:0x0d1420, roughness:0.9, metalness:0.1, wireframe:false });
+const floor = new THREE.Mesh(floorGeo, floorMat);
+floor.rotation.x = -Math.PI/2;
+rig.add(floor);
+
+const grid = new THREE.GridHelper(14, 28, 0x22D3EE, 0x1b2635);
+grid.position.y = 0.01;
+grid.material.opacity = 0.35;
+grid.material.transparent = true;
+rig.add(grid);
+
+function machineMesh(type){
+  const g = new THREE.Group();
+  const mat = (hex)=> new THREE.MeshStandardMaterial({ color:hex, roughness:0.45, metalness:0.35 });
+  if(type==='robot'){
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.5,0.4,16), mat(0x2a3446));
+    base.position.y=0.2; g.add(base);
+    const arm1 = new THREE.Mesh(new THREE.BoxGeometry(0.22,0.9,0.22), mat(0x334155));
+    arm1.position.y=0.85; g.add(arm1);
+    const arm2 = new THREE.Mesh(new THREE.BoxGeometry(0.9,0.2,0.2), mat(0x334155));
+    arm2.position.set(0.4,1.3,0); g.add(arm2);
+    g.userData.armPart = arm2;
+  } else if(type==='conveyor'){
+    const belt = new THREE.Mesh(new THREE.BoxGeometry(2.4,0.28,0.7), mat(0x2a3446));
+    belt.position.y=0.3; g.add(belt);
+    for(let i=-1;i<=1;i++){
+      const roller = new THREE.Mesh(new THREE.CylinderGeometry(0.14,0.14,0.8,12), mat(0x475569));
+      roller.rotation.z=Math.PI/2; roller.position.set(i*1.0,0.16,0); g.add(roller);
+    }
+  } else if(type==='agv'){
+    const body = new THREE.Mesh(new THREE.BoxGeometry(0.9,0.32,1.3), mat(0x2a3446));
+    body.position.y=0.3; g.add(body);
+    const wheelPositions = [[-0.4,-0.55],[0.4,-0.55],[-0.4,0.55],[0.4,0.55]];
+    wheelPositions.forEach(p=>{
+      const w = new THREE.Mesh(new THREE.CylinderGeometry(0.14,0.14,0.12,12), mat(0x475569));
+      w.rotation.x=Math.PI/2; w.position.set(p[0],0.14,p[1]); g.add(w);
+    });
+    const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.09,12,12), mat(0xffffff));
+    beacon.position.y=0.55; g.add(beacon); g.userData.beacon=beacon;
+  } else if(type==='cnc'){
+    const housing = new THREE.Mesh(new THREE.BoxGeometry(1.2,1.3,1.1), mat(0x2a3446));
+    housing.position.y=0.65; g.add(housing);
+    const spindle = new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,0.6,12), mat(0x64748b));
+    spindle.position.set(0,1.35,0); g.add(spindle); g.userData.spindle=spindle;
+  } else {
+    const rack = new THREE.Mesh(new THREE.BoxGeometry(1.4,1.5,1.0), mat(0x2a3446));
+    rack.position.y=0.75; g.add(rack);
+    for(let i=0;i<3;i++){
+      const shelf = new THREE.Mesh(new THREE.BoxGeometry(1.3,0.04,0.9), mat(0x475569));
+      shelf.position.set(0, 0.3+i*0.5, 0); g.add(shelf);
+    }
+  }
+  const glow = new THREE.Mesh(new THREE.SphereGeometry(0.16,16,16), new THREE.MeshBasicMaterial({ color:0x22c55e }));
+  glow.position.y = 1.9;
+  g.add(glow);
+  g.userData.glow = glow;
+  const haloGeo = new THREE.RingGeometry(0.55,0.68,32);
+  const halo = new THREE.Mesh(haloGeo, new THREE.MeshBasicMaterial({ color:0x22c55e, transparent:true, opacity:0.5, side:THREE.DoubleSide }));
+  halo.rotation.x = -Math.PI/2;
+  halo.position.y = 0.02;
+  g.add(halo);
+  g.userData.halo = halo;
+  return g;
+}
+
+const meshMap = {};
+const clickable = [];
+machines.forEach(m=>{
+  const mesh = machineMesh(m.type);
+  mesh.position.set(m.pos[0],0,m.pos[2]);
+  mesh.userData.id = m.id;
+  rig.add(mesh);
+  meshMap[m.id] = mesh;
+  mesh.traverse(o=>{ if(o.isMesh) { o.userData.rootId = m.id; clickable.push(o); } });
+});
+
+function statusColorHex(status){ return STATUS_COLOR[status]; }
+
+/* manual orbit-style controls */
+let isDragging=false, lastX=0, lastY=0, rigRotY=0.35, camDist=12, camPolar=0.95;
+rig.rotation.y = rigRotY;
+function updateCamera(){
+  camera.position.x = camDist*Math.sin(camPolar)*Math.sin(0);
+  camera.position.set(0, 5.5+camPolar*2, camDist);
+  camera.lookAt(0,0.6,0);
+}
+updateCamera();
+canvas.addEventListener('mousedown', e=>{ isDragging=true; lastX=e.clientX; lastY=e.clientY; });
+window.addEventListener('mouseup', ()=> isDragging=false);
+window.addEventListener('mousemove', e=>{
+  if(!isDragging) return;
+  const dx = e.clientX-lastX, dy=e.clientY-lastY;
+  rigRotY += dx*0.006;
+  rig.rotation.y = rigRotY;
+  camPolar = Math.max(0.15, Math.min(2.2, camPolar - dy*0.004));
+  updateCamera();
+  lastX=e.clientX; lastY=e.clientY;
+});
+canvas.addEventListener('wheel', e=>{
+  e.preventDefault();
+  camDist = Math.max(6, Math.min(20, camDist + e.deltaY*0.01));
+  updateCamera();
+}, {passive:false});
+
+const raycaster = new THREE.Raycaster();
+const mouseVec = new THREE.Vector2();
+canvas.addEventListener('click', e=>{
+  const rect = canvas.getBoundingClientRect();
+  mouseVec.x = ((e.clientX-rect.left)/rect.width)*2-1;
+  mouseVec.y = -((e.clientY-rect.top)/rect.height)*2+1;
+  raycaster.setFromCamera(mouseVec, camera);
+  const hits = raycaster.intersectObjects(clickable, true);
+  if(hits.length){
+    const id = hits[0].object.userData.rootId;
+    if(id) selectMachine(id);
+  }
+});
+
+function onTwinResize(){
+  const rect = canvas.parentElement.getBoundingClientRect();
+  renderer.setSize(rect.width, rect.height, false);
+  camera.aspect = rect.width/rect.height;
+  camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', onTwinResize);
+setTimeout(onTwinResize, 60);
+
+let rafT = 0;
+function animate(){
+  requestAnimationFrame(animate);
+  rafT += 0.016 * (factoryRunning ? speedMultiplier : 0.15);
+  machines.forEach(m=>{
+    const mesh = meshMap[m.id];
+    const col = statusColorHex(m.status);
+    mesh.userData.glow.material.color.set(col);
+    mesh.userData.halo.material.color.set(col);
+    const pulse = 0.85 + Math.sin(rafT*3 + m.pos[0])*0.15*(m.status==='running'?1:0.3);
+    mesh.userData.glow.scale.setScalar(pulse);
+    mesh.userData.halo.scale.setScalar(1+Math.sin(rafT*2+m.pos[2])*0.06);
+    mesh.userData.halo.material.opacity = m.status==='offline'? 0.15 : 0.45;
+    if(m.status==='running'){
+      if(mesh.userData.armPart) mesh.userData.armPart.rotation.y = Math.sin(rafT*1.4)*0.5;
+      if(mesh.userData.spindle) mesh.userData.spindle.rotation.y = rafT*20;
+      if(mesh.userData.beacon){ mesh.userData.beacon.material.color.setHSL(0.15,1,0.5+Math.sin(rafT*6)*0.3); }
+      if(m.type==='agv'){ mesh.position.x = m.pos[0] + Math.sin(rafT*0.5)*0.6; }
+    }
+  });
+  renderer.render(scene, camera);
+}
+animate();
+
+/* ============================================================
+   SIMULATION LOOP
+============================================================ */
+function stepMachine(m){
+  const running = m.status==='running';
+  const drift = (base,vol,min,max)=>{
+    let v = base + (Math.random()-0.5)*vol;
+    return Math.max(min, Math.min(max, v));
+  };
+  if(m.status==='offline'){
+    m.power = Math.max(0, m.power*0.8); m.current=Math.max(0,m.current*0.8);
+    m.rpm = 0; m.temp = drift(m.temp,0.3,22,m.temp);
+  } else if(m.status==='idle'){
+    m.temp = drift(m.temp, 0.4, 24, 40);
+    m.power = drift(m.power, 0.05, 0.05, 0.6);
+    m.current = drift(m.current, 0.1, 0.2, 1.2);
+    m.rpm = 0;
+    m.vibration = drift(m.vibration, 0.03, 0.02, 0.3);
+  } else if(m.status==='maintenance'){
+    m.temp = drift(m.temp, 0.6, 30, 55);
+    m.power = drift(m.power, 0.1, 0.1, 1);
+    m.rpm = 0;
+  } else {
+    const base = { robot:{t:44,p:3.2,c:6.5,r:1800,v:0.8}, conveyor:{t:36,p:1.4,c:3.2,r:120,v:0.4}, agv:{t:32,p:0.6,c:1.4,r:0,v:0.3}, cnc:{t:60,p:5.8,c:11.5,r:4200,v:1.2}, storage:{t:27,p:0.2,c:0.3,r:0,v:0.05} }[m.type];
+    m.temp = drift(m.temp, 1.2, base.t-8, base.t+14);
+    m.power = drift(m.power, 0.25, base.p*0.6, base.p*1.4);
+    m.current = drift(m.current, 0.4, base.c*0.6, base.c*1.4);
+    m.rpm = Math.round(drift(m.rpm, base.r*0.06, base.r*0.85, base.r*1.1));
+    m.vibration = drift(m.vibration, 0.08, base.v*0.5, base.v*1.6);
+  }
+  m.pressure = drift(m.pressure, 0.15, 99.5, 103);
+  m.humidity = drift(m.humidity, 0.4, 30, 55);
+
+  const overTemp = m.temp > {robot:60,conveyor:50,agv:45,cnc:78,storage:35}[m.type];
+  const overVib = m.vibration > {robot:1.4,conveyor:0.8,agv:0.6,cnc:2.0,storage:0.15}[m.type];
+  let riskDelta = (overTemp?1.5:0) + (overVib?1.5:0) + (m.status==='maintenance'?0.6:0) - (m.status==='running'&&!overTemp&&!overVib?0.3:0);
+  m.faultProb = Math.max(1, Math.min(97, m.faultProb + riskDelta + (Math.random()-0.5)*0.6));
+  m.health = Math.max(2, Math.min(100, 100 - m.faultProb*0.7 - (100-m.rul)*0.15));
+  m.rul = Math.max(1, Math.min(100, m.rul - (m.faultProb>50?0.15:0.01)*speedMultiplier));
+
+  ['temp','current','vibration','power'].forEach(k=>{
+    m.hist[k].push(m[k]);
+    if(m.hist[k].length>40) m.hist[k].shift();
+  });
+}
+
+function pushAlert(sev, machine, desc, rec){
+  const a = { id:alertIdSeq++, sev, machine, desc, rec, time:nowStr(), ts:Date.now() };
+  alerts.unshift(a);
+  if(alerts.length>60) alerts.pop();
+  renderAlerts();
+  updateAlertBadges();
+}
+
+function injectFault(targetId){
+  const m = targetId ? machines.find(x=>x.id===targetId) : machines[Math.floor(Math.random()*machines.length)];
+  const fault = FAULT_TYPES[Math.floor(Math.random()*FAULT_TYPES.length)];
+  switch(fault){
+    case 'Bearing failure': m.vibration *= 3.2; m.status='maintenance'; break;
+    case 'Motor overheating': m.temp += 28; m.status='maintenance'; break;
+    case 'High vibration': m.vibration *= 2.6; break;
+    case 'Sensor failure': m.status='offline'; break;
+    case 'Power spike': m.power *= 2.4; m.current *= 2.2; break;
+    case 'Conveyor jam': m.status='maintenance'; m.rpm=0; break;
+  }
+  m.faultProb = Math.min(97, m.faultProb+35);
+  m.health = Math.max(5, m.health-25);
+  pushAlert('critical', m.name, fault+' detected on '+m.id, recommendationFor(fault));
+  anomalyHistory.push(0.4+Math.random()*0.3);
+  if(selectedMachineId===m.id) renderDetail(m.id);
+  renderFleetList(); renderMachineList();
+}
+
+function recommendationFor(fault){
+  const map = {
+    'Bearing failure':'Schedule bearing inspection within 24h; reduce load until replaced.',
+    'Motor overheating':'Check cooling airflow and lubrication; throttle back load 20%.',
+    'High vibration':'Inspect mounting and alignment; verify no loose fasteners.',
+    'Sensor failure':'Swap sensor module; validate wiring harness continuity.',
+    'Power spike':'Inspect power supply and grounding; check for upstream surge.',
+    'Conveyor jam':'Clear obstruction and inspect belt tension before restart.',
+  };
+  return map[fault] || 'Dispatch maintenance technician for inspection.';
+}
+
+let simInterval = null;
+function tickSim(){
+  if(!factoryRunning) return;
+  tick++;
+  machines.forEach(stepMachine);
+  const runningCount = machines.filter(m=>m.status==='running').length;
+  const offlineOrMaint = machines.filter(m=>m.status==='offline'||m.status==='maintenance').length;
+  if(offlineOrMaint>0) downtimeMinutes += 0.05*speedMultiplier;
+
+  energyHistory.push(machines.reduce((s,m)=>s+m.power,0));
+  if(energyHistory.length>60) energyHistory.shift();
+  const avail = Math.max(60, 100-downtimeMinutes*0.4);
+  const perf = Math.max(60, 96 - machines.reduce((s,m)=>s+m.faultProb,0)/15);
+  const qual = Math.max(70, 99 - machines.filter(m=>m.status==='maintenance').length*4);
+  oeeHistory.push((avail*perf*qual)/10000);
+  if(oeeHistory.length>30) oeeHistory.shift();
+  energyProdHistory.push(energyHistory[energyHistory.length-1]/ (3+runningCount*0.4));
+  if(energyProdHistory.length>30) energyProdHistory.shift();
+  anomalyHistory.push(Math.max(0.03, 0.08 + machines.reduce((s,m)=>s+m.faultProb,0)/2000 + (Math.random()-0.5)*0.02));
+  if(anomalyHistory.length>40) anomalyHistory.shift();
+
+  if(tick%1===0){
+    if(Math.random() < 0.012*speedMultiplier){
+      const m = machines[Math.floor(Math.random()*machines.length)];
+      pushAlert('warning', m.name, 'Sensor drift observed on '+m.id, 'Monitor next 3 cycles; recalibrate if drift persists.');
+    }
+  }
+
+  renderOverviewKPIs(avail,perf,qual);
+  renderFleetList();
+  renderMachineList();
+  if(selectedMachineId) renderDetail(selectedMachineId);
+  updateOverviewChart();
+  updateAnalyticsCharts();
+}
+function startSimLoop(){
+  if(simInterval) clearInterval(simInterval);
+  simInterval = setInterval(tickSim, 1000);
+}
+startSimLoop();
+
+/* ============================================================
+   CONTROLS
+============================================================ */
+document.getElementById('btnStart').addEventListener('click', ()=>{
+  factoryRunning = true;
+  machines.forEach(m=>{ if(m.status==='offline' && m.faultProb<40) m.status='running'; });
+  setFactoryStatusUI('Running','#22c55e');
+});
+document.getElementById('btnStop').addEventListener('click', ()=>{
+  factoryRunning = false;
+  setFactoryStatusUI('Stopped','#f59e0b');
+});
+document.getElementById('btnEmergency').addEventListener('click', ()=>{
+  factoryRunning = false;
+  machines.forEach(m=>m.status='offline');
+  pushAlert('critical','All assets','Emergency stop triggered by operator','Verify line safety before restart; inspect all assets.');
+  setFactoryStatusUI('E-Stopped','#ef4444');
+  renderFleetList(); renderMachineList();
+  if(selectedMachineId) renderDetail(selectedMachineId);
+});
+document.getElementById('btnFault').addEventListener('click', ()=> injectFault());
+document.getElementById('btnReset').addEventListener('click', ()=>{
+  machines.forEach((m,i)=>{
+    Object.assign(m, JSON.parse(JSON.stringify(defaults[i])));
+    m.hist = mkHist();
+  });
+  alerts = []; downtimeMinutes=0; factoryRunning=true;
+  setFactoryStatusUI('Running','#22c55e');
+  renderAlerts(); updateAlertBadges(); renderFleetList(); renderMachineList();
+  if(selectedMachineId) renderDetail(selectedMachineId);
+});
+['speed1','speed5','speed10'].forEach(id=>{
+  document.getElementById(id).addEventListener('click', (e)=>{
+    speedMultiplier = Number(e.currentTarget.dataset.speed);
+    document.querySelectorAll('#speed1,#speed5,#speed10').forEach(b=>b.classList.remove('active'));
+    e.currentTarget.classList.add('active');
+  });
+});
+function setFactoryStatusUI(text,color){
+  document.getElementById('sidebarStatusText').textContent = text;
+  document.getElementById('sidebarStatusDot').style.background = color;
+}
+const defaults = JSON.parse(JSON.stringify(machines));
+
+/* ============================================================
+   RENDER: fleet / machine list
+============================================================ */
+const ICONS = {
+  robot:'<path d="M12 2v3M9 9V6h6v3M6 9h12v10H6z"/><circle cx="9.5" cy="13.5" r="1"/><circle cx="14.5" cy="13.5" r="1"/>',
+  conveyor:'<rect x="3" y="9" width="18" height="6" rx="1"/><circle cx="7" cy="18" r="1.5"/><circle cx="17" cy="18" r="1.5"/>',
+  agv:'<rect x="4" y="8" width="16" height="7" rx="1.5"/><circle cx="8" cy="17" r="1.6"/><circle cx="16" cy="17" r="1.6"/><path d="M9 8V5h6v3"/>',
+  cnc:'<rect x="5" y="4" width="14" height="16" rx="1.5"/><path d="M12 4v4M9 20v-3M15 20v-3"/><circle cx="12" cy="11" r="2"/>',
+  storage:'<rect x="4" y="4" width="16" height="16" rx="1.5"/><path d="M4 10h16M4 15h16"/>',
+};
+
+function renderFleetList(){
+  const el = document.getElementById('fleetStatusList');
+  el.innerHTML = machines.map(m=>`
+    <div style="display:flex;align-items:center;justify-content:between;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);" onclick="window.__jumpToTwin('${m.id}')">
+      <div style="display:flex;align-items:center;gap:9px;flex:1;cursor:pointer;">
+        <div class="m-icon" style="width:28px;height:28px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="width:14px;height:14px;">${ICONS[m.type]}</svg></div>
+        <div style="font-size:12.5px;font-weight:500;">${m.name}</div>
+      </div>
+      <span class="pill ${m.status}"><span class="dot"></span>${cap(m.status)}</span>
+    </div>
+  `).join('');
+}
+function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+function renderMachineList(){
+  const el = document.getElementById('machineList');
+  el.innerHTML = machines.map(m=>{
+    const tempClass = m.temp > {robot:58,conveyor:48,agv:42,cnc:74,storage:33}[m.type] ? (m.temp > {robot:65,conveyor:55,agv:48,cnc:82,storage:38}[m.type] ? 'crit':'warn') : '';
+    return `
+    <div class="machine-row" onclick="window.__jumpToTwin('${m.id}')">
+      <div class="m-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">${ICONS[m.type]}</svg></div>
+      <div><div class="m-name">${m.name}</div><div class="m-id">${m.id}</div></div>
+      <div><div class="m-metric ${tempClass?('sensor-cell-value '+tempClass):''}" style="${tempClass?'':''}">${fmt(m.temp,1)}°C</div><div class="m-metric-label">Temp</div></div>
+      <div><div class="m-metric">${fmt(m.power,2)} kW</div><div class="m-metric-label">Power</div></div>
+      <div><div class="m-metric">${Math.round(m.health)}%</div><div class="m-metric-label">Health</div></div>
+      <div><span class="pill ${m.status}"><span class="dot"></span>${cap(m.status)}</span></div>
+    </div>`;
+  }).join('');
+}
+
+window.__jumpToTwin = function(id){
+  document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+  document.querySelector('.nav-item[data-view="twin"]').classList.add('active');
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-twin').classList.add('active');
+  document.getElementById('topbarTitle').textContent = TITLES.twin[0];
+  document.getElementById('topbarSub').textContent = TITLES.twin[1];
+  setTimeout(onTwinResize, 30);
+  selectMachine(id);
+};
+
+/* ============================================================
+   RENDER: detail panel
+============================================================ */
+let detailCharts = {};
+function selectMachine(id){
+  selectedMachineId = id;
+  renderDetail(id);
+}
+function ring(pct, color){
+  const c = 2*Math.PI*40;
+  const offset = c*(1-pct/100);
+  return `<svg width="52" height="52" viewBox="0 0 52 52"><circle cx="26" cy="26" r="20" fill="none" stroke="rgba(148,163,184,0.14)" stroke-width="6"/><circle cx="26" cy="26" r="20" fill="none" stroke="${color}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${2*Math.PI*20}" stroke-dashoffset="${2*Math.PI*20*(1-pct/100)}" transform="rotate(-90 26 26)"/></svg>`;
+}
+function renderDetail(id){
+  const m = machines.find(x=>x.id===id);
+  if(!m) return;
+  const card = document.getElementById('detailCard');
+  const tempWarn = m.temp > {robot:58,conveyor:48,agv:42,cnc:74,storage:33}[m.type];
+  card.innerHTML = `
+    <div class="detail-head">
+      <div><div class="detail-name">${m.name}</div><div class="detail-id">${m.id}</div></div>
+      <span class="pill ${m.status}"><span class="dot"></span>${cap(m.status)}</span>
+    </div>
+    <div class="health-row">
+      <div class="health-ring">${ring(m.health, m.health>70?'#22c55e':m.health>40?'#f59e0b':'#ef4444')}<div class="health-ring-text">${Math.round(m.health)}</div></div>
+      <div class="health-meta"><div class="lbl">Health score</div><div class="val">Fault probability: ${Math.round(m.faultProb)}% · RUL ${Math.round(m.rul)}d</div></div>
+    </div>
+    <div class="sensor-grid">
+      <div class="sensor-cell"><div class="sensor-cell-label">Temperature</div><div class="sensor-cell-value ${tempWarn?'warn':''}">${fmt(m.temp,1)}°C</div></div>
+      <div class="sensor-cell"><div class="sensor-cell-label">Power</div><div class="sensor-cell-value">${fmt(m.power,2)} kW</div></div>
+      <div class="sensor-cell"><div class="sensor-cell-label">Current</div><div class="sensor-cell-value">${fmt(m.current,2)} A</div></div>
+      <div class="sensor-cell"><div class="sensor-cell-label">RPM</div><div class="sensor-cell-value">${Math.round(m.rpm)}</div></div>
+      <div class="sensor-cell"><div class="sensor-cell-label">Vibration</div><div class="sensor-cell-value">${fmt(m.vibration,2)} mm/s</div></div>
+      <div class="sensor-cell"><div class="sensor-cell-label">Pressure</div><div class="sensor-cell-value">${fmt(m.pressure,1)} kPa</div></div>
+      <div class="sensor-cell"><div class="sensor-cell-label">Humidity</div><div class="sensor-cell-value">${fmt(m.humidity,0)}%</div></div>
+      <div class="sensor-cell"><div class="sensor-cell-label">Remaining useful life</div><div class="sensor-cell-value">${Math.round(m.rul)} days</div></div>
+    </div>
+    <div class="mini-chart-title">Temperature / vibration</div>
+    <div class="chart-wrap" style="height:90px;"><canvas id="dcTemp" role="img" aria-label="Mini line chart of temperature and vibration">Temperature and vibration telemetry over recent samples.</canvas></div>
+    <div class="mini-chart-title">Current / power</div>
+    <div class="chart-wrap" style="height:90px;"><canvas id="dcPower" role="img" aria-label="Mini line chart of current and power">Current and power telemetry over recent samples.</canvas></div>
+  `;
+  buildDetailCharts(m);
+}
+function buildDetailCharts(m){
+  if(detailCharts.temp) detailCharts.temp.destroy();
+  if(detailCharts.power) detailCharts.power.destroy();
+  const labels = m.hist.temp.map((_,i)=>i);
+  const commonOpt = {
+    responsive:true, maintainAspectRatio:false, animation:false,
+    plugins:{legend:{display:false}},
+    scales:{ x:{display:false}, y:{display:false} },
+    elements:{point:{radius:0}}
+  };
+  detailCharts.temp = new Chart(document.getElementById('dcTemp'), {
+    type:'line', data:{ labels, datasets:[
+      { data:m.hist.temp, borderColor:'#3B82F6', borderWidth:1.6, tension:0.35, yAxisID:'y' },
+      { data:m.hist.vibration, borderColor:'#22D3EE', borderWidth:1.6, tension:0.35, yAxisID:'y1' },
+    ]}, options: Object.assign({}, commonOpt, { scales:{ x:{display:false}, y:{display:false}, y1:{display:false, position:'right'} } })
+  });
+  detailCharts.power = new Chart(document.getElementById('dcPower'), {
+    type:'line', data:{ labels, datasets:[
+      { data:m.hist.current, borderColor:'#8b5cf6', borderWidth:1.6, tension:0.35, yAxisID:'y' },
+      { data:m.hist.power, borderColor:'#f59e0b', borderWidth:1.6, tension:0.35, yAxisID:'y1' },
+    ]}, options: Object.assign({}, commonOpt, { scales:{ x:{display:false}, y:{display:false}, y1:{display:false, position:'right'} } })
+  });
+}
+
+/* ============================================================
+   RENDER: overview KPIs & chart
+============================================================ */
+let overviewChart;
+function initOverviewChart(){
+  overviewChart = new Chart(document.getElementById('overviewChart'), {
+    type:'line',
+    data:{ labels: energyHistory.map((_,i)=>i), datasets:[{ data: energyHistory.slice(), borderColor:'#3B82F6', backgroundColor:'rgba(59,130,246,0.12)', fill:true, borderWidth:2, tension:0.35, pointRadius:0 }]},
+    options:{ responsive:true, maintainAspectRatio:false, animation:false,
+      plugins:{legend:{display:false}},
+      scales:{ x:{display:false}, y:{ grid:{color:'rgba(148,163,184,0.08)'}, ticks:{color:'#5b6678', font:{family:'JetBrains Mono', size:10}} } }
+    }
+  });
+}
+function updateOverviewChart(){
+  overviewChart.data.labels = energyHistory.map((_,i)=>i);
+  overviewChart.data.datasets[0].data = energyHistory.slice();
+  overviewChart.update();
+}
+
+function renderOverviewKPIs(avail,perf,qual){
+  const oee = Math.round((avail*perf*qual)/10000);
+  document.getElementById('kpiOEE').innerHTML = oee+'<span>%</span>';
+  document.getElementById('kpiOEEBar').style.width = oee+'%';
+  const runningCount = machines.filter(m=>m.status==='running').length;
+  document.getElementById('kpiRunning').innerHTML = runningCount+'<span>/5</span>';
+  const issues = machines.filter(m=>m.status!=='running' && m.status!=='idle').length;
+  document.getElementById('kpiRunningDelta').textContent = issues>0 ? issues+' asset(s) need attention' : 'All nominal';
+  document.getElementById('kpiRunningDelta').className = 'kpi-delta '+(issues>0?'down':'up');
+  const energy = machines.reduce((s,m)=>s+m.power,0);
+  document.getElementById('kpiEnergy').innerHTML = fmt(energy,1)+'<span>kW</span>';
+  document.getElementById('kpiAlerts').textContent = alerts.length;
+  document.getElementById('kpiAlertsDelta').textContent = alerts.length>0 ? alerts[0].sev+' · '+alerts[0].machine : 'No active faults';
+  document.getElementById('kpiAlertsDelta').className = 'kpi-delta '+(alerts.length>0?'down':'up');
+  document.getElementById('kpiDowntime').innerHTML = Math.round(downtimeMinutes)+'<span>min</span>';
+  const prodToday = Math.min(3800, Math.round(3214 + tick*0.6*(runningCount/5)));
+  document.getElementById('kpiProdToday').innerHTML = prodToday.toLocaleString()+'<span>/ 3,800</span>';
+  document.getElementById('kpiProdBar').style.width = Math.round(prodToday/3800*100)+'%';
+  document.getElementById('kpiMTTR').innerHTML = fmt(1.8 + downtimeMinutes*0.01,1)+'<span>h</span>';
+}
+
+/* ============================================================
+   RENDER: analytics
+============================================================ */
+let oeeTrendChart, energyProdChart, anomalyChart;
+function initAnalyticsCharts(){
+  const lineOpt = (color)=>({
+    responsive:true, maintainAspectRatio:false, animation:false,
+    plugins:{legend:{display:false}},
+    elements:{point:{radius:0}},
+    scales:{ x:{display:false}, y:{ grid:{color:'rgba(148,163,184,0.08)'}, ticks:{color:'#5b6678', font:{family:'JetBrains Mono', size:10}} } }
+  });
+  oeeTrendChart = new Chart(document.getElementById('oeeTrendChart'), { type:'line', data:{ labels:oeeHistory.map((_,i)=>i), datasets:[{ data:oeeHistory.slice(), borderColor:'#22D3EE', borderWidth:2, tension:0.35 }]}, options: lineOpt() });
+  energyProdChart = new Chart(document.getElementById('energyProdChart'), { type:'line', data:{ labels:energyProdHistory.map((_,i)=>i), datasets:[{ data:energyProdHistory.slice(), borderColor:'#3B82F6', borderWidth:2, tension:0.35 }]}, options: lineOpt() });
+  anomalyChart = new Chart(document.getElementById('anomalyChart'), { type:'line', data:{ labels:anomalyHistory.map((_,i)=>i), datasets:[
+      { data:anomalyHistory.slice(), borderColor:'#8b5cf6', borderWidth:2, tension:0.35 },
+      { data:anomalyHistory.map(()=>0.28), borderColor:'#ef4444', borderWidth:1.4, borderDash:[4,4], tension:0 }
+    ]}, options: lineOpt() });
+}
+function updateAnalyticsCharts(){
+  oeeTrendChart.data.labels = oeeHistory.map((_,i)=>i);
+  oeeTrendChart.data.datasets[0].data = oeeHistory.slice();
+  oeeTrendChart.update();
+  energyProdChart.data.labels = energyProdHistory.map((_,i)=>i);
+  energyProdChart.data.datasets[0].data = energyProdHistory.slice();
+  energyProdChart.update();
+  anomalyChart.data.labels = anomalyHistory.map((_,i)=>i);
+  anomalyChart.data.datasets[0].data = anomalyHistory.slice();
+  anomalyChart.data.datasets[1].data = anomalyHistory.map(()=>0.28);
+  anomalyChart.update();
+
+  const avail = Math.max(60,100-downtimeMinutes*0.4), perf = Math.max(60,96-machines.reduce((s,m)=>s+m.faultProb,0)/15), qual = Math.max(70,99-machines.filter(m=>m.status==='maintenance').length*4);
+  document.getElementById('valAvail').textContent = Math.round(avail)+'%';
+  document.getElementById('valPerf').textContent = Math.round(perf)+'%';
+  document.getElementById('valQual').textContent = Math.round(qual)+'%';
+  document.getElementById('ringAvail').setAttribute('stroke-dashoffset', 251*(1-avail/100));
+  document.getElementById('ringPerf').setAttribute('stroke-dashoffset', 251*(1-perf/100));
+  document.getElementById('ringQual').setAttribute('stroke-dashoffset', 251*(1-qual/100));
+
+  renderRUL();
+  renderRCA();
+  renderRecos();
+}
+function renderRUL(){
+  const el = document.getElementById('rulBars');
+  el.innerHTML = machines.slice().sort((a,b)=>a.rul-b.rul).map(m=>{
+    const color = m.rul>60?'#22c55e':m.rul>30?'#f59e0b':'#ef4444';
+    return `<div class="rul-bar-row"><div class="rul-name">${m.id}</div><div class="rul-track"><div class="rul-fill" style="width:${m.rul}%;background:${color};"></div></div><div class="rul-val">${Math.round(m.rul)}d</div></div>`;
+  }).join('');
+}
+function renderRCA(){
+  const el = document.getElementById('rcaList');
+  const worst = machines.slice().sort((a,b)=>b.faultProb-a.faultProb)[0];
+  const factors = [
+    { name:'Vibration deviation from baseline', prob: Math.min(96, Math.round(worst.faultProb*1.1)) },
+    { name:'Thermal trend exceeding setpoint', prob: Math.min(90, Math.round(worst.faultProb*0.9)) },
+    { name:'Load cycling frequency increase', prob: Math.min(70, Math.round(worst.faultProb*0.55)) },
+    { name:'Sensor noise / calibration drift', prob: Math.min(50, Math.round(worst.faultProb*0.3)) },
+  ];
+  el.innerHTML = `<div style="font-size:11.5px;color:var(--text-faint);margin-bottom:8px;">Most likely asset: <b style="color:var(--text);">${worst.name} (${worst.id})</b></div>` +
+    factors.map(f=>`<div class="rca-item"><div class="rca-prob">${f.prob}%</div><div>${f.name}</div></div>`).join('');
+}
+function renderRecos(){
+  const el = document.getElementById('aiRecoList');
+  const recos = [];
+  machines.forEach(m=>{
+    if(m.faultProb>50) recos.push(`Prioritize inspection of <b style="color:var(--text);">${m.id}</b> — fault probability ${Math.round(m.faultProb)}%, trending up.`);
+    else if(m.rul<40) recos.push(`Schedule preventive maintenance for <b style="color:var(--text);">${m.id}</b> — RUL under 40 days.`);
+  });
+  if(recos.length===0) recos.push('All assets within nominal thresholds — no action required.');
+  recos.push('Consider staggering CNC and Robot Arm duty cycles to flatten peak energy draw.');
+  el.innerHTML = recos.slice(0,4).map(r=>`<div style="display:flex;gap:8px;"><span class="ai-tag" style="flex-shrink:0;">AI</span><span>${r}</span></div>`).join('');
+}
+
+/* ============================================================
+   RENDER: alerts
+============================================================ */
+function renderAlerts(){
+  const el = document.getElementById('alertsList');
+  if(alerts.length===0){
+    el.innerHTML = '<div class="alert-empty">No alerts. The line is running clean.</div>';
+    return;
+  }
+  el.innerHTML = alerts.map(a=>`
+    <div class="alert-row">
+      <div class="alert-sev ${a.sev}"></div>
+      <div class="alert-body">
+        <div class="alert-top"><span class="alert-badge ${a.sev}">${a.sev}</span><span class="alert-machine">${a.machine}</span><span class="alert-time">${a.time}</span></div>
+        <div class="alert-desc">${a.desc}</div>
+        <div class="alert-rec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.4.3.6.8.6 1.2v.5h6v-.5c0-.4.2-.9.6-1.2A6 6 0 0 0 12 3z"/></svg>${a.rec}</div>
+      </div>
+    </div>
+  `).join('');
+}
+function updateAlertBadges(){
+  const n = alerts.length;
+  document.getElementById('navAlertBadge').textContent = n;
+  document.getElementById('navAlertBadge').style.display = n>0 ? 'inline-flex' : 'none';
+  document.getElementById('bellDot').style.display = n>0 ? 'block' : 'none';
+}
+document.getElementById('clearAlertsBtn').addEventListener('click', ()=>{ alerts=[]; renderAlerts(); updateAlertBadges(); });
+document.getElementById('bellBtn').addEventListener('click', ()=> window.__jumpToView('alerts'));
+window.__jumpToView = function(v){
+  document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+  document.querySelector(`.nav-item[data-view="${v}"]`).classList.add('active');
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  document.getElementById('topbarTitle').textContent = TITLES[v][0];
+  document.getElementById('topbarSub').textContent = TITLES[v][1];
+};
+
+/* ============================================================
+   SETTINGS toggles
+============================================================ */
+['switchUnits','switchSound','switchAuto'].forEach(id=>{
+  document.getElementById(id).addEventListener('click', e=> e.currentTarget.classList.toggle('on'));
+});
+
+/* ============================================================
+   INIT
+============================================================ */
+initOverviewChart();
+initAnalyticsCharts();
+renderFleetList();
+renderMachineList();
+renderAlerts();
+updateAlertBadges();
+renderRUL();
+renderRCA();
+renderRecos();
+</script>
+</body>
+</html>
