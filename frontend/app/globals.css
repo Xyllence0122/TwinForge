@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ */
+/* TwinForge design tokens — dark-first industrial SaaS theme          */
+/* ------------------------------------------------------------------ */
+@theme {
+  --color-primary: #3b82f6;
+  --color-primary-dim: #2563eb;
+  --color-accent: #22d3ee;
+  --color-accent-dim: #0891b2;
+
+  --color-bg: #070b14;
+  --color-surface: #0b1120;
+  --color-surface-2: #101827;
+  --color-line: rgba(148, 163, 184, 0.12);
+
+  --color-ink: #e2e8f0;
+  --color-ink-dim: #94a3b8;
+  --color-ink-faint: #64748b;
+
+  --color-status-running: #10b981;
+  --color-status-idle: #64748b;
+  --color-status-maintenance: #f59e0b;
+  --color-status-offline: #ef4444;
+
+  --color-info: #38bdf8;
+  --color-warning: #f59e0b;
+  --color-critical: #ef4444;
+
+  --font-sans: "Inter", "SF Pro Text", -apple-system, "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --radius-card: 1rem;
+
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Glassmorphism card surface */
+.glass {
+  background: linear-gradient(
+    160deg,
+    rgba(148, 163, 184, 0.07),
+    rgba(148, 163, 184, 0.03) 55%
+  );
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.glass-strong {
+  background: rgba(11, 17, 32, 0.78);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Subtle blueprint grid used on landing + twin backdrop */
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+/* Thin, dark scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 116, 139, 0.35) transparent;
+}
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.35);
+  border-radius: 3px;
+}
+
+/* Numeric readouts should not jitter as digits change */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Status glow dots */
+.dot-glow {
+  box-shadow: 0 0 8px 1px currentColor;
+}
+
+::selection {
+  background: rgba(59, 130, 246, 0.35);
+}
