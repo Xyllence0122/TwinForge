@@ -24,14 +24,14 @@ export function LanguageSwitch() {
 
   return (
     <div ref={ref} className="relative">
+      {/* Icon-only trigger — the dropdown reveals the language options. */}
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label={dict.common.language}
-        className="flex h-9 items-center gap-2 rounded-xl border border-line bg-white/[0.03] px-3 text-xs font-medium text-ink-dim transition-colors hover:border-primary/40 hover:text-ink"
+        title={dict.common.language}
+        className="flex h-9 w-9 items-center justify-center rounded-xl border border-line bg-white/[0.03] text-ink-dim transition-colors hover:border-primary/40 hover:text-ink"
       >
         <Globe className="h-4 w-4" strokeWidth={1.5} />
-        <span className="hidden sm:inline">{LOCALES[locale].flag} {LOCALES[locale].label}</span>
-        <span className="sm:hidden">{LOCALES[locale].flag}</span>
       </button>
 
       <AnimatePresence>

@@ -38,7 +38,6 @@ const zhTW: Dictionary = {
     digitalTwin: "數位分身",
     settings: "設定",
     platform: "平台",
-    factory: "Aurora 廠 · 台中",
   },
 
   topbar: {
@@ -54,6 +53,7 @@ const zhTW: Dictionary = {
     openAlertCenter: "開啟警報中心",
     dataSource: "資料來源",
     localSim: "本地模擬",
+    apiConnected: "後端已連線",
     operator: "操作員",
   },
 

@@ -25,7 +25,12 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[
+        "http://localhost:3000",
+        "https://twin-forge.vercel.app",
+    ],
+    # Also accept Vercel preview deployments (twin-forge-<hash>.vercel.app).
+    allow_origin_regex=r"https://twin-forge.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

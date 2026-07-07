@@ -40,7 +40,6 @@ const en = {
     digitalTwin: "Digital Twin",
     settings: "Settings",
     platform: "Platform",
-    factory: "Aurora Fab · Taichung",
   },
 
   topbar: {
@@ -56,6 +55,7 @@ const en = {
     openAlertCenter: "Open Alert Center",
     dataSource: "Data source",
     localSim: "Local simulation",
+    apiConnected: "Live API",
     operator: "Operator",
   },
 

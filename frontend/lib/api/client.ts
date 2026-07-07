@@ -29,8 +29,8 @@ export interface Endpoints {
 }
 
 export const DEFAULT_ENDPOINTS: Endpoints = {
-  api: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000",
-  ws: "ws://localhost:8000/ws/telemetry",
+  api: process.env.NEXT_PUBLIC_API_URL ?? "https://twinforge.onrender.com",
+  ws: process.env.NEXT_PUBLIC_WS_URL ?? "wss://twinforge.onrender.com/ws/telemetry",
   mqtt: "mqtt://broker.factory.local:1883",
 };
 

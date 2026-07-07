@@ -88,8 +88,7 @@ export function Sidebar() {
       </nav>
 
       <div className="border-t border-line px-4 py-4">
-        <div className="hidden text-[10px] text-ink-faint lg:block">{dict.nav.factory}</div>
-        <div className="mt-1 hidden text-[10px] text-ink-faint/60 lg:block">TwinForge v1.0.0</div>
+        <div className="hidden text-[10px] text-ink-faint/60 lg:block">TwinForge v1.0.0</div>
       </div>
     </aside>
   );

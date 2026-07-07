@@ -8,6 +8,7 @@ import { Bell, Search } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useSimulation, selectUnackedCount } from "@/lib/simulation/store";
 import { useMounted } from "@/hooks/useMounted";
+import { useBackendStatus } from "@/hooks/useBackendStatus";
 import { ALERT_COLORS, STATUS_COLORS } from "@/lib/constants";
 import { cn, timeAgo } from "@/lib/utils";
 import { LanguageSwitch } from "./LanguageSwitch";
@@ -45,18 +46,44 @@ export function Topbar() {
 
       <div className="flex-1" />
 
+      <BackendIndicator />
       <MachineSearch />
       <NotificationBell />
       <LanguageSwitch />
 
       {/* User avatar */}
       <div
-        title={`${dict.topbar.operator} · L. Hsuan`}
+        title={dict.topbar.operator}
         className="flex h-9 w-9 select-none items-center justify-center rounded-xl border border-line bg-gradient-to-br from-primary/30 to-accent/20 text-xs font-semibold text-ink"
       >
-        LH
+        MC
       </div>
     </header>
+  );
+}
+
+/* ------------------------ Backend indicator ------------------------ */
+
+function BackendIndicator() {
+  const { dict } = useI18n();
+  const state = useBackendStatus();
+  const mounted = useMounted();
+  if (!mounted) return null;
+
+  const color = state === "connected" ? "#10B981" : "#64748B";
+  const label = state === "connected" ? dict.topbar.apiConnected : dict.topbar.localSim;
+
+  return (
+    <div
+      title={dict.topbar.dataSource}
+      className="hidden items-center gap-2 rounded-xl border border-line bg-white/[0.03] px-3 py-1.5 md:flex"
+    >
+      <span
+        className="dot-glow h-1.5 w-1.5 rounded-full"
+        style={{ backgroundColor: color, color }}
+      />
+      <span className="text-[11px] font-medium text-ink-dim">{label}</span>
+    </div>
   );
 }
 
