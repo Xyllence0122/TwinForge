@@ -1,32 +1,12 @@
 # TwinForge
 
-**Industrial Digital Twin Platform — 工業數位分身平台**
+工業數位分身平台。把工廠裡的機台做成可互動的 3D digital twin，配上即時遙測、警報中心、產線 KPI，以及一層預留給預測性維護模型的 AI 介面。
 
-TwinForge mirrors every machine on a factory floor into an interactive 3D digital twin with real-time telemetry, health analytics, an alert center, production KPIs and an AI-ready predictive-maintenance layer. Built as a production-grade reference platform in the style of a modern industrial SaaS (Siemens Xcelerator / Linear / Vercel aesthetic).
+前端是 Next.js 15 + React Three Fiber，後端是 FastAPI（選用，前端有內建模擬器可以單獨跑）。
 
-![Stack](https://img.shields.io/badge/Next.js%2015-App%20Router-black) ![React](https://img.shields.io/badge/React%2019-TypeScript-blue) ![R3F](https://img.shields.io/badge/React%20Three%20Fiber-3D%20Twin-8b5cf6) ![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688)
+## 跑起來
 
----
-
-## ✨ Features
-
-| Area | What it does |
-|---|---|
-| **Landing page** | Animated factory hero, feature cards, architecture diagram, stats, showcase, CTA |
-| **Digital Twin (core)** | Interactive React Three Fiber factory — robot arms, conveyor, AGVs, CNC machines, ASRS storage crane. Live status colors (Running / Idle / Maintenance / Offline), per-machine animation, click-to-inspect detail panel |
-| **Real-time telemetry** | Temperature, current, power, RPM, pressure, humidity, vibration — streaming charts per machine + factory power/energy |
-| **Machine detail** | Health Score, Fault Probability, Remaining Useful Life gauges, 7-channel live sensor grid, 4 trend charts, AI insights |
-| **Simulation control** | Start / Stop / Emergency Stop / Inject Fault / Reset, speed ×1 ×5 ×10 |
-| **Fault injection** | Bearing failure, motor overheating, high vibration, sensor failure, power spike, conveyor jam — each with realistic sensor signatures |
-| **Alert Center** | Info / Warning / Critical alerts with timestamp, machine, description and recommendation; acknowledge workflow, filters, live notification bell |
-| **Analytics** | OEE (A×P×Q), MTBF, MTTR, energy consumption, downtime pareto, daily production vs target |
-| **AI layer** | Anomaly detection (LSTM-Autoencoder-shaped interface), root-cause ranking, RUL forecast, AI recommendations — mock inference behind production contracts |
-| **i18n** | 🇺🇸 English + 🇹🇼 繁體中文, instant switch everywhere, type-safe dictionaries, add a locale in one file |
-| **Dark mode** | Dark-first glassmorphism design system, primary `#3B82F6`, cyan accent |
-
-## 🚀 Quick start
-
-### Frontend (Next.js)
+前端：
 
 ```bash
 cd frontend
@@ -34,88 +14,75 @@ npm install
 npm run dev          # http://localhost:3000
 ```
 
-### Backend (FastAPI — optional; the console runs standalone on its local simulation)
+後端（選用，前端預設用本地模擬，不接後端也能完整運作）：
 
 ```bash
 cd backend
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
-# OpenAPI docs: http://localhost:8000/docs
+# API 文件在 http://localhost:8000/docs
 ```
 
-## 🗂 Project structure
+## 有什麼
+
+- 3D 工廠場景：機械手臂、輸送帶、AGV、CNC、ASRS 天車。機台狀態會反映在顏色上（Running / Idle / Maintenance / Offline），點機台可以看細節
+- 即時遙測：溫度、電流、功率、轉速、壓力、濕度、振動，每台機器有自己的串流圖表
+- 機台詳細頁：健康分數、故障機率、剩餘壽命（RUL），加上趨勢圖和 AI 建議
+- 模擬控制：啟動 / 停止 / 緊急停止 / 注入故障 / 重置，速度可調 x1 x5 x10
+- 故障注入：軸承損壞、馬達過熱、振動異常、感測器失效、電源突波、輸送帶卡料，每種都有對應的感測器特徵
+- 警報中心：Info / Warning / Critical 三級，有時間戳、機台、描述、處理建議，可 acknowledge
+- 分析頁：OEE、MTBF、MTTR、能耗、停機柏拉圖、日產量 vs 目標
+- AI 層目前是 mock，但介面照正式的合約設計（異常偵測、根因排序、RUL 預測），之後可以直接換成真模型
+- i18n：英文 + 繁體中文，字典是 type-safe 的，缺 key 會在編譯期報錯
+- 深色 glassmorphism 風格
+
+## 目錄結構
 
 ```
 twinforge/
 ├── frontend/
 │   ├── app/                        # Next.js App Router
 │   │   ├── page.tsx                # Landing page
-│   │   ├── layout.tsx              # Root layout (fonts, i18n provider)
-│   │   ├── error.tsx / not-found.tsx
+│   │   ├── layout.tsx              # Root layout（字型、i18n provider）
 │   │   └── dashboard/
-│   │       ├── layout.tsx          # Console shell (sidebar/topbar/sim loop)
-│   │       ├── page.tsx            # Overview
-│   │       ├── machines/           # Fleet + [id] detail
-│   │       ├── analytics/          # KPI dashboard
-│   │       ├── alerts/             # Alert Center
-│   │       ├── twin/               # 3D Digital Twin
-│   │       └── settings/           # Language, integrations, about
-│   ├── components/
-│   │   ├── ui/                     # GlassCard, Button, Badge, Gauge, Skeleton…
-│   │   ├── layout/                 # Sidebar, Topbar, LanguageSwitch, Logo
-│   │   ├── charts/                 # RealtimeChart, Sparkline
-│   │   ├── twin/                   # FactoryScene, 3D machines, DetailPanel
-│   │   ├── machines/               # MachineCard, AiInsights
-│   │   ├── alerts/                 # AlertRow
-│   │   ├── simulation/             # ControlPanel
-│   │   └── landing/                # FactoryBackdrop
+│   │       ├── layout.tsx          # 主控台外框（sidebar / topbar / sim loop）
+│   │       ├── page.tsx            # 總覽
+│   │       ├── machines/           # 機台列表 + [id] 詳細頁
+│   │       ├── analytics/          # KPI
+│   │       ├── alerts/             # 警報中心
+│   │       ├── twin/               # 3D 場景
+│   │       └── settings/
+│   ├── components/                 # ui / layout / charts / twin / machines / alerts ...
 │   ├── hooks/                      # useSimulationLoop, useMounted
 │   └── lib/
-│       ├── types.ts                # Domain types (mirror of backend schemas)
-│       ├── constants.ts            # Colors, units, thresholds
-│       ├── i18n/                   # en.ts, zh-TW.ts, provider
-│       ├── api/client.ts           # Typed FastAPI client + WS subscription
+│       ├── types.ts                # Domain types（跟後端 schema 對齊）
+│       ├── i18n/                   # en.ts, zh-TW.ts
+│       ├── api/client.ts           # FastAPI client + WebSocket 訂閱
 │       └── simulation/             # fleet, engine, store, ai, analytics
 └── backend/
     └── app/
-        ├── main.py                 # FastAPI app + WebSocket /ws/telemetry
-        ├── schemas.py              # Pydantic models (camelCase JSON contract)
-        ├── core/simulation.py      # Server-side telemetry engine
+        ├── main.py                 # FastAPI app + /ws/telemetry
+        ├── schemas.py              # Pydantic models（JSON 用 camelCase）
+        ├── core/simulation.py      # 伺服器端遙測引擎
         └── routers/                # machines, alerts, analytics, ai
 ```
 
-## 🧠 Architecture
+## 要接真實資料的話
 
-```
-┌─────────────┐   MQTT    ┌──────────────┐   SQL    ┌────────────────┐
-│  Edge nodes │ ────────▶ │   FastAPI    │ ───────▶ │  PostgreSQL +  │
-│ ESP32 / RPi │           │   gateway    │          │  TimescaleDB   │
-└─────────────┘           │  /ws + REST  │          └────────────────┘
-                          └──────┬───────┘                 ▲
-                                 │ WebSocket / REST        │ hypertable queries
-                          ┌──────▼────────────────────────────────┐
-                          │      Next.js console (this app)       │
-                          │  Zustand telemetry store ◀─ contract  │
-                          └───────────────────────────────────────┘
-```
+設計上幾個地方是可以直接抽換的：
 
-**Swap-in points (no redesign needed):**
+- **資料來源**：所有元件只讀 Zustand store（`lib/simulation/store.ts`），要接真機台就用 WebSocket/MQTT handler 餵一樣的 state。`lib/api/client.ts` 的 `subscribeTelemetry` 已經接好 FastAPI 的 `/ws/telemetry`，payload 格式跟本地模擬相同。
+- **AI 模型**：AI 相關元件都只依賴 `lib/types.ts` 的型別（`AnomalyResult`、`AiRecommendation`、`RootCauseNode`）。把 `lib/simulation/ai.ts` 換成呼叫 `/api/ai/*`，後端再把 `routers/ai.py` 裡的 stub 換成真模型就好。
+- **資料庫**：後端 telemetry endpoint 的查詢形狀是照 TimescaleDB continuous aggregate 設計的，`core/simulation.py` 裡有寫要怎麼換成 repository。
+- **加語言**：新增 `lib/i18n/<locale>.ts` 滿足 `Dictionary` 型別，註冊到 `LOCALES`。
+- **加機台**：在 `createFleet()` 加一筆，3D 場景、列表、搜尋、分析都會自動吃到。
 
-- **Data source** — components only read from the Zustand store (`lib/simulation/store.ts`). A WebSocket/MQTT handler dispatching the same state updates replaces the local engine; `lib/api/client.ts#subscribeTelemetry` is already wired for FastAPI's `/ws/telemetry`, which pushes the identical `Machine[]` payload.
-- **AI models** — every AI consumer depends on the typed contracts in `lib/types.ts` (`AnomalyResult`, `AiRecommendation`, `RootCauseNode`). Replace `lib/simulation/ai.ts` with calls to `/api/ai/*`; on the backend, swap `LSTMAutoencoderStub` in `routers/ai.py` for a real model.
-- **Persistence** — backend telemetry endpoints are shaped like TimescaleDB continuous-aggregate queries; `core/simulation.py` documents the repository swap.
-- **New language** — add `lib/i18n/<locale>.ts` satisfying `Dictionary` and register it in `LOCALES`. Missing keys are compile-time errors.
-- **New machine** — add one entry to `createFleet()`; the 3D scene, fleet grid, search and analytics pick it up automatically.
+## 技術
 
-## 🔩 Tech stack
+Next.js 15 (App Router) / React 19 / TypeScript / Tailwind v4 / React Three Fiber / Recharts / Zustand / Framer Motion。後端 FastAPI + Pydantic v2。
 
-**Frontend** Next.js 15 (App Router) · React 19 · TypeScript (strict) · Tailwind CSS v4 · Framer Motion · React Three Fiber + three.js · Recharts · Zustand · lucide-react
+## 其他
 
-**Backend** FastAPI · Pydantic v2 · Uvicorn (WebSocket streaming)
-
-## 📝 Notes
-
-- The console defaults to the **local simulation** so the whole product runs with `npm run dev` alone — no backend required. The FastAPI service exposes the same contract for production integration.
-- Simulation tick: 1 s ÷ speed; each tick advances 5 s of simulated plant time.
-- Alert thresholds and fault sensor-signatures live in `lib/simulation/engine.ts`.
+- 模擬 tick 是 1 秒除以速度倍率，每個 tick 推進 5 秒的廠內時間
+- 警報門檻和故障的感測器特徵定義在 `lib/simulation/engine.ts`

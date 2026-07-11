@@ -258,7 +258,26 @@ export const useSimulation = create<SimulationState>((set, get) => ({
   },
 }));
 
+/**
+ * Optional physical alarm output (Grove Beginner Kit via hardware/bridge).
+ * Set NEXT_PUBLIC_HARDWARE_BRIDGE_URL to enable; unset by default so the
+ * console behaves identically for everyone else. See hardware/README.md.
+ */
+const HARDWARE_BRIDGE_URL = process.env.NEXT_PUBLIC_HARDWARE_BRIDGE_URL;
+
+function notifyHardware(level: AlertLevel): void {
+  if (!HARDWARE_BRIDGE_URL || (level !== "warning" && level !== "critical")) return;
+  fetch(`${HARDWARE_BRIDGE_URL}/alert`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ level }),
+  }).catch(() => {
+    /* bridge not running — hardware notification is best-effort */
+  });
+}
+
 function pushAlert(existing: Alert[], ...added: Alert[]): Alert[] {
+  added.forEach((a) => notifyHardware(a.level));
   return [...added.reverse(), ...existing].slice(0, MAX_ALERTS);
 }
 
